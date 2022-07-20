@@ -7,10 +7,7 @@ const twemoji = require("twemoji");
 const twOptions = { folder: "svg", ext: ".svg" };
 const emojify = (text: string) => twemoji.parse(text, twOptions);
 
-const pretendardFontPath = path.resolve(
-  require.resolve("pretendard"),
-  "./dist/web/static/woff2"
-);
+const pretendardFontPath = "./node_modules/pretendard/dist/web/static/woff2";
 
 const pretendardFontRegular = readFileSync(
   path.resolve(pretendardFontPath, "./Pretendard-Regular.woff2")
@@ -53,14 +50,14 @@ function getCss(theme: string, fontSize: string) {
     @font-face {
         font-family: 'Pretendard';
         font-style:  normal;
-        font-weight: normal;
+        font-weight: 500;
         src: url(data:font/woff2;charset=utf-8;base64,${pretendardFontMedium}) format('woff2');
     }
 
     @font-face {
         font-family: 'Pretendard';
         font-style:  normal;
-        font-weight: normal;
+        font-weight: 600;
         src: url(data:font/woff2;charset=utf-8;base64,${pretendardFontSemiBold}) format('woff2');
     }
 
@@ -83,102 +80,42 @@ function getCss(theme: string, fontSize: string) {
         background-image: radial-gradient(circle at 25px 25px, ${radial} 2%, transparent 0%), radial-gradient(circle at 75px 75px, ${radial} 2%, transparent 0%);
         background-size: 100px 100px;
         height: 100vh;
-        display: flex;
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-    }
-
-    code {
-        color: #D400FF;
-        font-family: 'Vera';
-        white-space: pre-wrap;
-        letter-spacing: -5px;
-    }
-
-    code:before, code:after {
-        content: '\`';
-    }
-
-    .logo-wrapper {
-        display: flex;
-        align-items: center;
-        align-content: center;
-        justify-content: center;
-        justify-items: center;
-    }
-
-    .logo {
-        margin: 0 75px;
-    }
-
-    .plus {
-        color: #BBB;
-        font-family: Times New Roman, Verdana;
-        font-size: 100px;
-    }
-
-    .spacer {
-        margin: 150px;
-    }
-
-    .emoji {
-        height: 1em;
-        width: 1em;
-        margin: 0 .05em 0 .1em;
-        vertical-align: -0.1em;
-    }
-    
-    .heading {
+        padding-inline: 8rem;
         font-family: 'Pretendard', sans-serif;
         font-size: ${sanitizeHtml(fontSize)};
         font-style: normal;
         color: ${foreground};
-        line-height: 1.8;
     }`;
 }
 
 export function getHtml(parsedReq: ParsedRequest) {
-  const { text, theme, md, fontSize, images = [], widths, heights } = parsedReq;
-  console.log(images);
+  const { text, theme, md, fontSize } = parsedReq;
   return `<!DOCTYPE html>
 <html>
     <meta charset="utf-8">
     <title>Generated Image</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        ${getCss(theme, fontSize)}
+      ${getCss(theme, fontSize)}
     </style>
     <body>
-        <div>
-            <div class="logo-wrapper">
-                ${images
-                  .map(
-                    (img, i) =>
-                      getPlusSign(i) + getImage(img, widths[i], heights[i])
-                  )
-                  .join("")}
-            </div>
-            <div class="spacer">
-            <div class="heading">${emojify(
-              md ? marked(text) : sanitizeHtml(text)
-            )}
-            </div>
-        </div>
+      <div>
+        ${emojify(md ? marked(text) : sanitizeHtml(text))}
+      </div>
     </body>
 </html>`;
 }
 
-function getImage(src: string, width = "auto", height = "225") {
-  return `<img
-        class="logo"
-        alt="Generated Image"
-        src="${sanitizeHtml(src)}"
-        width="${sanitizeHtml(width)}"
-        height="${sanitizeHtml(height)}"
-    />`;
-}
+// function getImage(src: string, width = "auto", height = "225") {
+//   return `<img
+//         class="logo"
+//         alt="Generated Image"
+//         src="${sanitizeHtml(src)}"
+//         width="${sanitizeHtml(width)}"
+//         height="${sanitizeHtml(height)}"
+//     />`;
+// }
 
-function getPlusSign(i: number) {
-  return i === 0 ? "" : '<div class="plus">+</div>';
-}
+// function getPlusSign(i: number) {
+//   return i === 0 ? "" : '<div class="plus">+</div>';
+// }
